@@ -1,0 +1,15 @@
+Google Login Instructions - Common User:
+    - Everyone's gmail should be added as "testing users" in the google api console, so you should be able to login with that
+    - When logged in, only a line with your name and email will appear
+    - When we finalize this sprint, I think we need to add the common user email account either as a testing user or publish the app so that it doesnt matter
+
+"Site Admin" accounts:
+    - To add site admins, go to django admin page and add specific users to the SiteAdmin group
+    - For now, this shouldn't give them any privileges, except being greeted with an acknowledgement of their site admin status upon login
+    - We may need to add the ASD-provided site admin email to this group, or maybe when their testing the app theyll add that account?
+
+"Django Admin" account:
+    - Currently created superuser account with the ASD-provided django admin email w/ username/password set to "admin"
+    - If superuser is logged in they should get an acknowledgement that they are the django admin account
+    - Can't fully test this however without having the password to cs3240.django@gmail.com, but maybe someone can add one of their gmails as superuser to test this
+    

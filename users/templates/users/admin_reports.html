@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - View Reports</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
+    <style>
+        .button-container .btn {
+            margin: 0 10px;
+        }
+        .btn-custom {
+            background-color: #e87404; /* UVA Orange */
+            color: white;
+            font-family: 'Nanum Gothic', sans-serif;
+            font-weight: bold;
+        }
+        .btn-custom:hover {
+            background-color: #282c4c;
+            color: white;
+        }
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        body > .content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1;
+            padding: 1rem;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            text-align: center;
+            padding: 10px 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+{% include "users/navbar.html" %}
+{% load socialaccount %}
+{% block content %}
+<h2 class="mb-4 text-center">Submitted Reports</h2>
+<div class="content">
+{% for report in reports %}
+    <div class="card mb-3 w-75">
+      <div class="card-header">
+        {% if report.name_of_reporter %}
+          <h5 class="mb-0">{{ report.name_of_reporter }}</h5>
+        {% else %}
+          <h5 class="mb-0">Anonymous</h5>
+        {% endif %}
+      </div>
+      <div class="card-body">
+          <strong>Report ID:</strong> {{ report.id }}
+          <p class="mb-0"><strong>Created at:</strong> {{ report.created_at }}</p>
+      </div>
+      <div class="card-footer">
+        <button class="btn btn-custom details-button">Show Details</button>
+      </div>
+      <div class="report-details" style="display: none;">
+        <ul class="list-group list-group-flush">
+            {% if report.name_of_reporter %}
+              <li class="list-group-item"><strong>Reporter Name:</strong> {{ report.name_of_reporter }}</li>
+              <li class="list-group-item"><strong>Email:</strong> {{ report.email_of_reporter }}</li>
+            {% endif %}
+            <li class="list-group-item"><strong>Phone:</strong> {{ report.phone_num_of_reporter }}</li>
+            <li class="list-group-item"><strong>Organization</strong> {{ report.organization_of_reporter }}</li>
+            <li class="list-group-item"><strong>Date of Incident:</strong> {{ report.date_of_incident }}</li>
+            <li class="list-group-item"><strong>Time of Incident:</strong> {{ report.time_of_incident }}</li>
+            <li class="list-group-item"><strong>Location:</strong> {{ report.location_of_incident }}</li>
+            <li class="list-group-item"><strong>Description:</strong> {{ report.description_of_event }}</li>
+            <li class="list-group-item"><strong>Date Submitted:</strong> {{ report.created_at }}</li>
+            <li class="list-group-item">
+            {% if report.admin_comment %}
+              <div>{{ report.admin_comment }}</div>
+              <button class="btn btn-primary edit-comment-button" data-report-id="{{ report.id }}">Edit Comment</button>
+              <form method="post" class="edit-comment-form" data-report-id="{{ report.id }}" style="display: none;">
+                {% csrf_token %}
+                <input type="hidden" name="report_id" value="{{ report.id }}">
+                <textarea name="admin_comment">{{ report.admin_comment }}</textarea>
+                <button type="submit" class="btn-custom">Submit Comment</button>
+              </form>
+            {% else %}
+             <form method="post">
+                 {% csrf_token %}
+                 <input type="hidden" name="report_id" value="{{ report.id }}">
+                 <textarea name="admin_comment" placeholder="Enter comment here"></textarea>
+                 <button type="submit" class="btn-custom">Submit Comment</button>
+             </form>
+             {% endif %}
+         </li>
+         <li class="list-group-item">
+             <form method="post">
+                 {% csrf_token %}
+                 <input type="hidden" name="report_id" value="{{ report.id }}">
+                 <select name="new_status">
+                     <option value="in_progress" {% if report.status == 'in_progress' %}selected="selected"{% endif %}>In Progress</option>
+                     <option value="resolved" {% if report.status == 'resolved' %}selected="selected"{% endif %}>Resolved</option>
+                 </select>
+                 <button type="submit" class="btn-custom">Update Status</button>
+             </form>
+        </li>
+        <li class="list-group-item">
+            <strong>Uploaded Files:</strong>
+            {% for file in report.files.all %}
+                {% with reportID=report.id|stringformat:"s" %}
+                {% with prefix="uploads/"|add:reportID %}
+                {% with file_name=file.file.name|cut:prefix %}
+               <ul><a href="https://ifc-jc-whistleblower-amazon-storage-bucket.s3.amazonaws.com/media/{{ file.file.name }}">{{ file_name }}</a></ul>
+                {% endwith %}
+                {% endwith %}
+                {% endwith %}
+            {% empty %}
+              <ul><a>No file uploaded</a></ul>
+            {% endfor %}
+        </li>
+      </ul>
+     </div>
+</div>
+ {% empty %}
+<p>No reports have been submitted yet.</p>
+ {% endfor %}
+{% endblock %}
+    </div>
+<footer class="footer">
+        <div class="container">
+            <p> DISCLAIMER: This is a school project that is not intended for actual use.</p>
+        </div>
+    </footer>
+<script>
+  $(document).ready(function() {
+    $('.details-button').click(function() {
+      $(this).parent().next('.report-details').slideToggle();
+      if ($(this).text() == 'Show Details') {
+        $(this).text('Hide Details');
+      } else {
+        $(this).text('Show Details');
+      }
+    });
+    $('.edit-comment-button').click(function() {
+      var reportId = $(this).data('report-id');
+      $('.edit-comment-form[data-report-id="' + reportId + '"]').slideToggle();
+      $(this).toggle();
+      $(this).siblings('div').toggle();
+    });
+  });
+</script>
+</body>
+</html>
+
+

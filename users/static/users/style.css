@@ -1,0 +1,61 @@
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@700;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&display=swap');
+
+body {
+    font-family: 'Nanum Gothic', sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'PT Sans', sans-serif;
+}
+
+
+.btn-custom {
+    background-color: #e87404; /* UVA Orange */
+    font-family: 'Nanum Gothic', sans-serif;
+    font-weight: bold;
+    border-radius: 4px;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    position: relative;
+    margin: 4px 2px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+
+.btn-custom:hover {
+    background-color: #282c4c; /* UVA Blue */
+    color: white;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.content-wrapper {
+    flex: 1;
+    padding-bottom: 100px;
+}
+
+.footer {
+    height: 75px;
+    width: 100%;
+    background: #f8f9fa;
+    text-align: center;
+    line-height: 50px;
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+}
+
+.form-group strong {
+    margin-left: 0;
+    padding-left: 0;
+}
